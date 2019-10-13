@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+
+    <title>Play King</title>
+
+    <style type="text/css">
+        .winner {
+            background-color: lawngreen;
+        }
+        .loser {
+            background-color: tomato;
+        }
+        .winHeader {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .winnerName {
+            text-align: center;
+            font-weight: 700;
+            font-size: x-large;
+        }
+        .nameHolder {
+            padding:20px
+        }
+        .nameHolder p > span {
+            display: inline-block;
+            width: 50%;
+            text-align: right;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            vertical-align: middle;
+        }
+        .nameHolder > p > div {
+            vertical-align: middle;
+        }
+    </style>
+
+    <script src="https://kit.fontawesome.com/2cc46be90a.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+    <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
+    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+  </head>
+  <body>
+    <div id="app">
+        <b-button id="yb" variant="primary" @click="$bvModal.show('newStartWarning')" style="margin: 1em 0 1em 1em;"><i class="fas fa-redo-alt" ></i></b-button>
+        <b-tooltip target="yb" triggers="hover">Yeniden Başla</b-tooltip>
+        <b-container>
+            <b-row style="margin-bottom: 5%;">
+                <b-col lg="6" offset-sm="3">
+                    <div>
+                      <b-table-simple bordered hover small responsive>
+                        <b-thead head-variant="dark">
+                          <b-tr>
+                            <b-th>Oyuncular</b-th>
+                            <b-th>Cezalar</b-th>
+                            <b-th>Kozlar</b-th>
+                            <b-th>Puan</b-th>
+                          </b-tr>
+                        </b-thead>
+                        <b-tbody>
+                          <b-tr v-for="p in players" :class="isOver && p.isWinner ? 'winner' : isOver ? 'loser' : ''">
+                            <b-th rowspan="1">{{p.name.length < 14 ? p.name : `${p.name.substr(0, 11) + ".."}`}}</b-th>
+                            <b-td>{{p.remainingPunishGames}}</b-td>
+                            <b-td>{{p.remainingTrumpGames}}</b-td>
+                            <b-td variant="success">{{p.points}}</b-td>
+                          </b-tr>
+                        </b-tbody>
+                        <b-tfoot>
+                          <b-tr>
+                            <b-td colspan="7" variant="secondary" class="text-right">
+                              Kalan Oyun: {{remainingGameCount}}
+                            </b-td>
+                          </b-tr>
+                        </b-tfoot>
+                      </b-table-simple>
+                    </div>
+                </b-col>
+            </b-row>
+
+            <b-row class="justify-content-md-center mb-4">
+                <b-col class="mb-1" lg="3" v-for="g in games">
+                    <b-input-group class="mr-2" size="sm" v-bind:prepend="g.name">
+                        <b-form-input readonly :value="g.remainingCount"></b-form-input>
+                    </b-input-group>
+                </b-col>
+            </b-row>
+
+            <b-row v-if="playedGames.length" style="margin-top: 5%;">
+                <b-col lg="8" offset-sm="2">
+                    <div>
+                      <b-table-simple bordered striped small hover responsive>
+                        <b-thead head-variant="dark">
+                          <b-tr>
+                            <b-th>Sıra</b-th>
+                            <b-th>Oyun</b-th>
+                            <b-th>{{players[0].name.length < 14 ? players[0].name : `${players[0].name.substr(0, 11) + ".."}`}}</b-th>
+                            <b-th>{{players[1].name.length < 14 ? players[1].name : `${players[1].name.substr(0, 11) + ".."}`}}</b-th>
+                            <b-th>{{players[2].name.length < 14 ? players[2].name : `${players[2].name.substr(0, 11) + ".."}`}}</b-th>
+                            <b-th>{{players[3].name.length < 14 ? players[3].name : `${players[3].name.substr(0, 11) + ".."}`}}</b-th>
+                            <b-th>Eylemler</b-th>
+                          </b-tr>
+                        </b-thead>
+                        <b-tbody>
+                          <b-tr v-for="(pg, i) in playedGames">
+                            <b-th>{{i+1}}</b-th>
+                            <b-th>{{gamesObj[pg.gameId].name}}</b-th>
+                            <b-td>{{(pg.gameId === 'koz' && pg[0] > 0 ? '+' : '') + pg[0] * gamesObj[pg.gameId].damage}}</b-td>
+                            <b-td>{{(pg.gameId === 'koz' && pg[1] > 0 ? '+' : '') + pg[1] * gamesObj[pg.gameId].damage}}</b-td>
+                            <b-td>{{(pg.gameId === 'koz' && pg[2] > 0 ? '+' : '') + pg[2] * gamesObj[pg.gameId].damage}}</b-td>
+                            <b-td>{{(pg.gameId === 'koz' && pg[3] > 0 ? '+' : '') + pg[3] * gamesObj[pg.gameId].damage}}</b-td>
+                            <b-td>
+                                <b-button-group size="sm">
+                                    <b-button :id="'edt'+i" variant="warning" @click="showEditGameModal(i)" :disabled="isOver"><i class="fas fa-pencil-alt"></i></b-button>
+                                    <b-tooltip :target="'edt'+i" triggers="hover" placement="left">Düzenle</b-tooltip>
+                                    <b-button id="del" v-if="i === playedGames.length - 1" variant="danger" @click="$bvModal.show('deleteGameWarning')" :disabled="isOver"><i class="fas fa-trash-alt"></i></b-button>
+                                    <b-tooltip target="del" triggers="hover" placement="right">Sil</b-tooltip>
+                                </b-button-group>
+                            </b-td>
+                          </b-tr>
+                        </b-tbody>
+                      </b-table-simple>
+                    </div>
+                </b-col>
+            </b-row>
+            <p style="text-align: center;"><b-button id="add" variant="success" @click="showNewGameModal" :disabled="isOver"><i class="fas fa-plus"></i></b-button></p>
+            <b-tooltip target="add" triggers="hover" placement="bottom">Oyun Ekle</b-tooltip>
+        </b-container>
+
+        <b-modal id="newStartWarning" ref="newStartWarning" title="Dikkat!" cancel-title="İptal" @ok="handleNewStartWarning">
+            <p>Oyun bilgileri sıfırlanacak. Emin misiniz?</p>
+        </b-modal>
+
+        <b-modal id="newPlayers" ref="newPlayers" no-close-on-backdrop ok-only @ok="handleNewPlayers">
+            <template v-slot:modal-header>
+                <h3>Oyuncular</h3>
+            </template>
+
+            <template v-slot:default="{}">
+                <form ref="newPlayersForm" @submit.stop.prevent="handleSubmit">
+                    <b-form-group label="Ad" label-for="name-input" invalid-feedback="Name is required" v-for="(p, i) in players">
+                        <b-form-input id="name-input" v-model="p.name" required />
+                    </b-form-group>
+                </form>
+            </template>
+        </b-modal>
+
+        <b-modal id="newGame" ref="newGame" title="Yeni Oyun" @ok="handleNewGame">
+            <form ref="newGameForm">
+                <b-form-select v-model="selectedGame" :options="remainingGames" v-on:change="selectNewGame" required>
+                    <template v-slot:first>
+                        <option :value="null" disabled>-- Oyun Seç --</option>
+                    </template>
+                </b-form-select>
+
+                <div class="nameHolder">
+                    <p v-for="i in [0,1,2,3]">
+                        <span>{{players[i].name.length < 14 ? players[i].name : `${players[i].name.substr(0, 11) + ".."}`}}: </span>
+                        <b-button-group>
+                          <b-button @click="togglePoints(i, -1)">-</b-button>
+                          <b-button disabled>{{newGame[i]}}</b-button>
+                          <b-button @click="togglePoints(i)">+</b-button>
+                        </b-button-group>
+                    </p>
+                </div>
+            </form>
+        </b-modal>
+
+        <b-modal id="editGame" ref="editGame" title="Oyunu Düzenle" @ok="handleEditGame">
+            <form ref="editGameForm">
+                <p style="text-align: center;border: solid 1px #777;">{{editGame.gameName}}</p>
+
+                <div v-for="i in [0,1,2,3]" style="margin-top: 1em;">
+                    <p style="text-align: center;">
+                        <span>{{players[i].name}}: </span>
+                        <b-button-group>
+                          <b-button @click="togglePoints(i, -1, true)">-</b-button>
+                          <b-button disabled>{{editGame[i]}}</b-button>
+                          <b-button @click="togglePoints(i, 1, true)">+</b-button>
+                        </b-button-group>
+                    </p>
+                </div>
+            </form>
+        </b-modal>
+
+        <b-modal id="deleteGameWarning" ref="deleteGameWarning" title="Dikkat!" @ok="deleteGame">
+            <p>Oyun silinecek. Emin misiniz?</p>
+        </b-modal>
+
+        <b-modal id="winnersModal" ref="winnersModal" title="Oyun bitti!" ok-only>
+            <div v-if="onlyWinner.wins">
+                <p class="winHeader">TEBRİKLER</p>
+                <p class="winnerName">{{onlyWinner.name}}</p>
+            </div>
+            <div v-else>
+                <p class="winHeader">Oyunun kazananları:</p>
+                <p class="winnerName" v-for="p in players"><span v-if="p.points >= 0">{{p.name}}</span></p>
+            </div>
+        </b-modal>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+    <script>
+        var app = new Vue({
+            el: '#app',
+            data: {
+                players: [],
+                games: [],
+                gamesObj: {},
+                playedGames: [],
+                remainingGames: [],
+                player0: {id: 0, name:'Oyuncu 1', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
+                player1: {id: 1, name:'Oyuncu 2', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
+                player2: {id: 2, name:'Oyuncu 3', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
+                player3: {id: 3, name:'Oyuncu 4', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
+                elAlmaz: {id: 'elAlmaz', name: 'El Almaz', turnCount: 13, damage: -60, remainingCount: 2},
+                kupaAlmaz: {id: 'kupaAlmaz', name: 'Kupa Almaz', turnCount: 13, damage: -30, remainingCount: 2},
+                erkekAlmaz: {id: 'erkekAlmaz', name: 'Erkek Almaz', turnCount: 8, damage: -50, remainingCount: 2},
+                kizAlmaz: {id: 'kizAlmaz', name: 'Kız Almaz', turnCount: 4, damage: -100, remainingCount: 2},
+                rifki: {id: 'rifki', name: 'Rıfkı', turnCount: 1, damage: -320, remainingCount: 2},
+                soniki: {id: 'soniki', name: 'Son İki', turnCount: 2, damage: -180, remainingCount: 2},
+                koz: {id: 'koz', name: 'Koz', turnCount: 13, damage: 50, remainingCount: 8},
+                isOver: false,
+                selectedGame: null,
+                onlyWinner: {wins: false, name: ''},
+                maxPointsAvailable: 13,
+                remainingGameCount: 20,
+                newGame: {0: 0, 1: 0, 2: 0, 3: 0},
+                editGame: {gameName: '', 0: 0, 1: 0, 2: 0, 3: 0}
+            },
+            methods: {
+                setFromLocalStorage() {
+                    this.games = [this.elAlmaz, this.kupaAlmaz, this.erkekAlmaz, this.kizAlmaz, 
+                        this.rifki, this.soniki, this.koz]
+
+                    if (localStorage.getItem('onlyWinner')) {
+                        this.onlyWinner = JSON.parse(localStorage.getItem('onlyWinner'))
+                    }
+
+                    if (localStorage.getItem('isOver')) {
+                        this.isOver = localStorage.getItem('isOver') === "true"
+                        if (this.isOver) {
+                            setTimeout(() => {
+                                let that = this
+                                that.showWinnersModal()
+                            }, 500)
+                        }
+                    }
+
+                    if (localStorage.getItem('remainingGameCount')) {
+                        this.remainingGameCount = parseInt(localStorage.getItem('remainingGameCount'), 10)
+                    }
+
+                    if (localStorage.getItem('playedGames')) {
+                        this.playedGames = JSON.parse(localStorage.getItem('playedGames'))
+                    }
+
+                    for (let i = 0; i < 4; i++) {
+                        if (localStorage.getItem('player'+i)) {
+                            this['player'+i] = JSON.parse(localStorage.getItem('player'+i))
+                        }
+                    }
+
+                    for (let i = 0; i < this.games.length; i++) {
+                        if (localStorage.getItem(this.games[i].id)) {
+                            this.games[i].remainingCount = parseInt(localStorage.getItem(this.games[i].id), 10)
+                        }
+                    }
+
+                    for (let i = 0; i < this.games.length; i++) {
+                        this.gamesObj[this.games[i].id] = this.games[i]
+                    }
+
+                    for (let i = 0; i < 4; i++) {
+                        this.players.push(this['player'+i])
+                    }
+                },
+                showNewPlayersModal() {
+                    this.$refs['newPlayers'].show()
+                },
+                showWinnersModal() {
+                    this.$refs['winnersModal'].show()
+                },
+                hideNewPlayersModal() {
+                    this.$refs['newPlayers'].hide()
+                },
+                hideNewGameModal() {
+                    this.$refs['newGame'].hide()
+                },
+                hideEditGameModal() {
+                    this.$refs['editGame'].hide()
+                },
+                handleNewStartWarning() {
+                    localStorage.clear()
+                    this.showNewPlayersModal()
+                },
+                handleNewPlayers(e) {
+                    e.preventDefault()
+
+                    if (!this.$refs.newPlayersForm.checkValidity()) {
+                      alert('Tüm alanlar zorunludur')
+                      return
+                    }
+
+                    for (let i = 0; i < this.players.length; i++) {
+                        let p = {id: i, name: this['player'+i].name, remainingPunishGames: 3, remainingTrumpGames: 2, points: 0}
+                        localStorage.setItem('player'+i, JSON.stringify(p))
+                    }
+
+                    this.$nextTick(() => {
+                        this.hideNewPlayersModal()
+                        window.location.reload()
+                    })
+                },
+                showNewGameModal() {
+                    this.selectedGame = null
+                    this.newGame = {0: 0, 1: 0, 2: 0, 3: 0}
+                    this.remainingGames = []
+
+                    let pIndex = this.playedGames.length % 4
+
+                    if (this['player'+pIndex].remainingPunishGames > 0) {
+                        for (let i = 0; i < this.games.length; i++) {
+                            if (this.games[i].remainingCount > 0 && this.games[i].id !== 'koz') {
+                                this.remainingGames.push({
+                                    text: this.games[i].name,
+                                    value: this.games[i].id
+                                })
+                            }
+                        }
+                    }
+
+                    if (this['player'+pIndex].remainingTrumpGames > 0) {
+                        this.remainingGames.push({
+                            text: 'Koz',
+                            value: 'koz'
+                        })
+                    }
+
+                    this.$refs['newGame'].show()
+                },
+                selectNewGame() {
+                    this.newGame = {0: 0, 1: 0, 2: 0, 3: 0}
+                    this.maxPointsAvailable = this[this.selectedGame].turnCount
+                },
+                handleNewGame(e) {
+                    e.preventDefault()
+                    if (!this.selectedGame || this.maxPointsAvailable !== 0) {
+                      alert('Eksik var!')
+                      return
+                    }
+
+                    let dmg = this.gamesObj[this.selectedGame].damage
+                    let pIndex = this.playedGames.length % 4
+
+                    this.selectedGame === 'koz' 
+                        ? this['player'+pIndex].remainingTrumpGames -= 1
+                            : this['player'+pIndex].remainingPunishGames -= 1
+
+                    for (let i in this.newGame) {
+                        this['player'+i].points += this.newGame[i] * dmg
+
+                        if (this.selectedGame === 'koz' && this.newGame[i] > 8) {
+                            this.isOver = true
+                            localStorage.setItem('isOver', true)
+
+                            let ow = {wins: true, name: this['player'+i].name}
+                            this.onlyWinner = ow
+                            localStorage.setItem('onlyWinner', JSON.stringify(ow))
+
+                            this['player'+i].isWinner = true
+                        }
+                        localStorage.setItem('player'+i, JSON.stringify(this['player'+i]))
+                    }
+
+                    this.remainingGameCount -= 1
+                    localStorage.setItem('remainingGameCount', this.remainingGameCount)
+
+                    this[this.selectedGame].remainingCount -= 1
+                    localStorage.setItem(this.selectedGame, this[this.selectedGame].remainingCount)
+
+                    let o = {
+                        gameId: this.selectedGame,
+                        0: this.newGame[0],
+                        1: this.newGame[1],
+                        2: this.newGame[2],
+                        3: this.newGame[3]
+                    }
+
+                    this.playedGames.push(o)
+                    localStorage.setItem('playedGames', JSON.stringify(this.playedGames))
+
+                    if (!this.remainingGameCount && !this.isOver) {
+                        this.isOver = true
+                        localStorage.setItem('isOver', true)
+
+                        for (let i = 0; i < this.players.length; i++) {
+                            if (this['player'+i].points >= 0) this['player'+i].isWinner = true
+                            localStorage.setItem('player'+i, JSON.stringify(this['player'+i]))
+                        }
+                    }
+
+                    this.$nextTick(() => {
+                        this.hideNewGameModal()
+                    })
+                    this.$nextTick(() => {
+                        if (this.isOver) this.showWinnersModal()
+                    })
+                },
+                showEditGameModal(index) {
+                    let game = this.playedGames[index]
+
+                    this.editGameIndex = index
+                    this.selectedGame = game.gameId
+                    this.maxPointsAvailable = 0
+                    
+                    this.editGame.gameName = this[game.gameId].name
+                    for (let i = 0; i < 4; i++) {
+                        this.editGame[i] = game[i]
+                    }
+
+                    this.$refs['editGame'].show()
+                },
+                handleEditGame(e) {
+                    e.preventDefault()
+                    if (!this.selectedGame || this.maxPointsAvailable !== 0) {
+                      alert('Eksik var!')
+                      return
+                    }
+
+                    let game = this.playedGames[this.editGameIndex]
+                    let dmg = this.gamesObj[game.gameId].damage
+
+                    for (let i = 0; i < 4; i++) {
+                        this['player'+i].points += (game[i]*-1*dmg) + (this.editGame[i]*dmg)
+
+                        localStorage.setItem('player'+i, JSON.stringify(this['player'+i]))
+
+                        game[i] = this.editGame[i]
+                    }
+                    localStorage.setItem('playedGames', JSON.stringify(this.playedGames))
+
+                    this.$nextTick(() => {
+                        this.hideEditGameModal()
+                    })
+                },
+                togglePoints(i, m = 1, isEdit = false) {
+                    let g = isEdit ? 'editGame' : 'newGame'
+                    let maxTurnCount = -1
+                    if (this.selectedGame) maxTurnCount = this[this.selectedGame].turnCount
+
+                    if (this.maxPointsAvailable - m <= maxTurnCount && this.maxPointsAvailable - m > -1
+                        && this[g][i] + m < maxTurnCount+1 && this[g][i] + m >= 0) {
+                        this.maxPointsAvailable -= m
+                        this[g][i] = this[g][i] + m
+                    }
+                },
+                deleteGame() {
+                    let pIndex = (this.playedGames.length - 1) % 4
+                    let playedGame = this.playedGames[this.playedGames.length-1]
+
+                    this.remainingGameCount += 1
+                    localStorage.setItem('remainingGameCount', this.remainingGameCount)
+
+                    this[playedGame.gameId].remainingCount += 1
+                    localStorage.setItem(playedGame.gameId, this[playedGame.gameId].remainingCount)
+
+                    playedGame.gameId === 'koz' ? 
+                        this['player'+pIndex].remainingTrumpGames += 1 : 
+                            this['player'+pIndex].remainingPunishGames += 1
+
+                    for (let i = 0; i < this.players.length; i++) {
+                        this['player'+i].points += playedGame[i] * this[playedGame.gameId].damage * (-1)
+                        localStorage.setItem('player'+i, JSON.stringify(this['player'+i]))
+                    }
+
+                    this.playedGames.pop()
+                    localStorage.setItem('playedGames', JSON.stringify(this.playedGames))
+                }
+            },
+            beforeMount() {
+                this.setFromLocalStorage()
+            }
+        })
+    </script>
+  </body>
+</html>
