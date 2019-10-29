@@ -1,8 +1,7 @@
 # King
-An SPA to keep score records for the card game "King".
-  *written with popular js framework Vue.js*
+An SPA to keep score records for the card game "King". It's available [here](http://play-king.herokuapp.com/).
 
-## Usage
-Just open king.html file in a browser. (Soon, there will be a website.)
-
-Note: It uses localStorage, so it's fine to reload the page.
+## TODOs
+- Add unit tests.
+- Use firebase to save game data instead of local storage.
+- Make shareable URLs, so that other players can see the score in their devices, as well.
