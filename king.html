@@ -92,6 +92,9 @@
                     </b-input-group>
                 </b-col>
             </b-row>
+              
+            <p style="text-align: center;"><b-button id="add" variant="success" @click="showNewGameModal" :disabled="isOver"><i class="fas fa-plus"></i></b-button></p>
+            <b-tooltip target="add" triggers="hover" placement="bottom">Oyun Ekle</b-tooltip>
 
             <b-row v-if="playedGames.length" style="margin-top: 5%;">
                 <b-col lg="8" offset-sm="2">
@@ -130,8 +133,6 @@
                     </div>
                 </b-col>
             </b-row>
-            <p style="text-align: center;"><b-button id="add" variant="success" @click="showNewGameModal" :disabled="isOver"><i class="fas fa-plus"></i></b-button></p>
-            <b-tooltip target="add" triggers="hover" placement="bottom">Oyun Ekle</b-tooltip>
         </b-container>
 
         <b-modal id="newStartWarning" ref="newStartWarning" title="Dikkat!" cancel-title="İptal" @ok="handleNewStartWarning">
@@ -222,9 +223,9 @@
                 player1: {id: 1, name:'Oyuncu 2', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
                 player2: {id: 2, name:'Oyuncu 3', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
                 player3: {id: 3, name:'Oyuncu 4', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
-                elAlmaz: {id: 'elAlmaz', name: 'El Almaz', turnCount: 13, damage: -60, remainingCount: 2},
+                elAlmaz: {id: 'elAlmaz', name: 'El Almaz', turnCount: 13, damage: -50, remainingCount: 2},
                 kupaAlmaz: {id: 'kupaAlmaz', name: 'Kupa Almaz', turnCount: 13, damage: -30, remainingCount: 2},
-                erkekAlmaz: {id: 'erkekAlmaz', name: 'Erkek Almaz', turnCount: 8, damage: -50, remainingCount: 2},
+                erkekAlmaz: {id: 'erkekAlmaz', name: 'Erkek Almaz', turnCount: 8, damage: -60, remainingCount: 2},
                 kizAlmaz: {id: 'kizAlmaz', name: 'Kız Almaz', turnCount: 4, damage: -100, remainingCount: 2},
                 rifki: {id: 'rifki', name: 'Rıfkı', turnCount: 1, damage: -320, remainingCount: 2},
                 soniki: {id: 'soniki', name: 'Son İki', turnCount: 2, damage: -180, remainingCount: 2},
