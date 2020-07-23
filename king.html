@@ -50,10 +50,25 @@
   </head>
   <body>
     <div id="app">
-        <b-button id="yb" variant="primary" @click="$bvModal.show('newStartWarning')" style="margin: 1em 0 1em 1em;"><i class="fas fa-redo-alt" ></i></b-button>
-        <b-tooltip target="yb" triggers="hover">Yeniden Başla</b-tooltip>
+        <b-button id="yb" variant="primary" @click="$bvModal.show('newStartWarning')" style="margin: 1em 0 1em 1em;">
+          <i class="fas fa-redo-alt" ></i>
+          Yeniden Basla
+        </b-button>
+
+
+        <div style="display: grid; justify-content: center;" class="mb-3">
+          <b-button v-b-toggle.collapse-1 variant="light">Kalan Oyunlar</b-button>
+          <b-collapse id="collapse-1" class="mt-2">
+            <div style="width: 200px;">
+              <div class="mb-1" v-for="(g, i) in games" :style="{display: 'flex', justifyContent: 'space-between', borderBottom: i < games.length - 1 ? 'solid 1px #ddd' : null}">
+                <span>{{g.name}}</span> <span>{{g.remainingCount}}</span>
+              </div>
+            </div>
+          </b-collapse>
+        </div>
+
         <b-container>
-            <b-row style="margin-bottom: 5%;">
+            <b-row>
                 <b-col lg="6" offset-sm="3">
                     <div>
                       <b-table-simple bordered hover small responsive>
@@ -67,10 +82,21 @@
                         </b-thead>
                         <b-tbody>
                           <b-tr v-for="p in players" :class="isOver && p.isWinner ? 'winner' : isOver ? 'loser' : ''">
-                            <b-th rowspan="1">{{p.name.length < 14 ? p.name : `${p.name.substr(0, 11) + ".."}`}}</b-th>
-                            <b-td>{{p.remainingPunishGames}}</b-td>
-                            <b-td>{{p.remainingTrumpGames}}</b-td>
-                            <b-td variant="success">{{p.points}}</b-td>
+                            <b-td rowspan="1">
+                              <span v-html="isActive(p.active)"></span>
+                              {{shorten(p.name, 18)}}
+                            </b-td>
+                            <b-td>
+                              <span v-for="i in p.remainingPunishGames" class="mr-1">
+                                <i class="fa fa-square" aria-hidden="true" style="font-size: 11px; color: lightcoral;"></i>
+                              </span>
+                            </b-td>
+                            <b-td>
+                              <span v-for="i in p.remainingTrumpGames" class="mr-1">
+                                <i class="fa fa-square" aria-hidden="true" style="font-size: 11px; color: lightgreen;"></i>
+                              </span>
+                            </b-td>
+                            <b-td style="font-weight: bold;">{{p.points}}</b-td>
                           </b-tr>
                         </b-tbody>
                         <b-tfoot>
@@ -85,18 +111,14 @@
                 </b-col>
             </b-row>
 
-            <b-row class="justify-content-md-center mb-4">
-                <b-col class="mb-1" lg="3" v-for="g in games">
-                    <b-input-group class="mr-2" size="sm" v-bind:prepend="g.name">
-                        <b-form-input readonly :value="g.remainingCount"></b-form-input>
-                    </b-input-group>
-                </b-col>
-            </b-row>
-              
-            <p style="text-align: center;"><b-button id="add" variant="success" @click="showNewGameModal" :disabled="isOver"><i class="fas fa-plus"></i></b-button></p>
-            <b-tooltip target="add" triggers="hover" placement="bottom">Oyun Ekle</b-tooltip>
+            <div style="display: flex; justify-content: center;" class="mt-4 mb-3">
+              <b-button id="add" variant="success" @click="showNewGameModal" :disabled="isOver">
+                <i class="fas fa-plus"></i>
+                Oyun Ekle
+              </b-button>
+            </div>
 
-            <b-row v-if="playedGames.length" style="margin-top: 5%;">
+            <b-row v-if="playedGames.length">
                 <b-col lg="8" offset-sm="2">
                     <div>
                       <b-table-simple bordered striped small hover responsive>
@@ -104,10 +126,9 @@
                           <b-tr>
                             <b-th>Sıra</b-th>
                             <b-th>Oyun</b-th>
-                            <b-th>{{players[0].name.length < 14 ? players[0].name : `${players[0].name.substr(0, 11) + ".."}`}}</b-th>
-                            <b-th>{{players[1].name.length < 14 ? players[1].name : `${players[1].name.substr(0, 11) + ".."}`}}</b-th>
-                            <b-th>{{players[2].name.length < 14 ? players[2].name : `${players[2].name.substr(0, 11) + ".."}`}}</b-th>
-                            <b-th>{{players[3].name.length < 14 ? players[3].name : `${players[3].name.substr(0, 11) + ".."}`}}</b-th>
+                            <b-th v-for="p in players">
+                              {{shorten(p.name, 14)}}
+                            </b-th>
                             <b-th>Eylemler</b-th>
                           </b-tr>
                         </b-thead>
@@ -240,7 +261,7 @@
             },
             methods: {
                 setFromLocalStorage() {
-                    this.games = [this.elAlmaz, this.kupaAlmaz, this.erkekAlmaz, this.kizAlmaz, 
+                    this.games = [this.elAlmaz, this.kupaAlmaz, this.erkekAlmaz, this.kizAlmaz,
                         this.rifki, this.soniki, this.koz]
 
                     if (localStorage.getItem('onlyWinner')) {
@@ -313,7 +334,14 @@
                     }
 
                     for (let i = 0; i < this.players.length; i++) {
-                        let p = {id: i, name: this['player'+i].name, remainingPunishGames: 3, remainingTrumpGames: 2, points: 0}
+                        let p = {
+                          id: i,
+                          name: this['player'+i].name,
+                          remainingPunishGames: 3,
+                          remainingTrumpGames: 2,
+                          points: 0,
+                          active: i === 0,
+                        }
                         localStorage.setItem('player'+i, JSON.stringify(p))
                     }
 
@@ -363,9 +391,13 @@
                     let dmg = this.gamesObj[this.selectedGame].damage
                     let pIndex = this.playedGames.length % 4
 
-                    this.selectedGame === 'koz' 
+                    this.selectedGame === 'koz'
                         ? this['player'+pIndex].remainingTrumpGames -= 1
                             : this['player'+pIndex].remainingPunishGames -= 1
+
+                  this['player'+pIndex].active = false;
+                  const nextPlayerIndex = pIndex === 3 ? 0 : pIndex + 1;
+                  this['player'+nextPlayerIndex].active = true;
 
                     for (let i in this.newGame) {
                         this['player'+i].points += this.newGame[i] * dmg
@@ -423,7 +455,7 @@
                     this.editGameIndex = index
                     this.selectedGame = game.gameId
                     this.maxPointsAvailable = 0
-                    
+
                     this.editGame.gameName = this[game.gameId].name
                     for (let i = 0; i < 4; i++) {
                         this.editGame[i] = game[i]
@@ -475,9 +507,13 @@
                     this[playedGame.gameId].remainingCount += 1
                     localStorage.setItem(playedGame.gameId, this[playedGame.gameId].remainingCount)
 
-                    playedGame.gameId === 'koz' ? 
-                        this['player'+pIndex].remainingTrumpGames += 1 : 
+                    playedGame.gameId === 'koz' ?
+                        this['player'+pIndex].remainingTrumpGames += 1 :
                             this['player'+pIndex].remainingPunishGames += 1
+
+                  this['player'+pIndex].active = true;
+                  const nextPlayerIndex = pIndex === 3 ? 0 : pIndex + 1;
+                  this['player'+nextPlayerIndex].active = false;
 
                     for (let i = 0; i < this.players.length; i++) {
                         this['player'+i].points += playedGame[i] * this[playedGame.gameId].damage * (-1)
@@ -486,7 +522,15 @@
 
                     this.playedGames.pop()
                     localStorage.setItem('playedGames', JSON.stringify(this.playedGames))
-                }
+                },
+                shorten(name, maxLength) {
+                  return name.length < maxLength ? name : `${name.substr(0, maxLength - 3)}..`
+                },
+              isActive(active) {
+                  return active ?
+                    '<i class="fa fa-circle" aria-hidden="true" style="color: limegreen;"></i>' :
+                    '<i class="fa fa-circle" aria-hidden="true" style="color: white;"></i>';
+              },
             },
             beforeMount() {
                 this.setFromLocalStorage()
