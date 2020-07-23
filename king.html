@@ -57,11 +57,19 @@
 
 
         <div style="display: grid; justify-content: center;" class="mb-3">
-          <b-button v-b-toggle.collapse-1 variant="light">Kalan Oyunlar</b-button>
+          <b-button v-b-toggle.collapse-1 variant="light" style="width: 150px;">
+            Kalan Oyunlar
+          </b-button>
           <b-collapse id="collapse-1" class="mt-2">
-            <div style="width: 200px;">
-              <div class="mb-1" v-for="(g, i) in games" :style="{display: 'flex', justifyContent: 'space-between', borderBottom: i < games.length - 1 ? 'solid 1px #ddd' : null}">
-                <span>{{g.name}}</span> <span>{{g.remainingCount}}</span>
+            <div style="width: 150px;">
+              <div v-for="(g, i) in games">
+                <div
+                  v-if="g.remainingCount > 0"
+                  class="mb-1"
+                  :style="{display: 'flex', justifyContent: 'space-between', borderBottom: i < games.length - 1 ? 'solid 1px #ddd' : null}"
+                >
+                  <span>{{g.name}}</span> <span>{{g.remainingCount}}</span>
+                </div>
               </div>
             </div>
           </b-collapse>
@@ -136,10 +144,9 @@
                           <b-tr v-for="(pg, i) in playedGames">
                             <b-th>{{i+1}}</b-th>
                             <b-th>{{gamesObj[pg.gameId].name}}</b-th>
-                            <b-td>{{(pg.gameId === 'koz' && pg[0] > 0 ? '+' : '') + pg[0] * gamesObj[pg.gameId].damage}}</b-td>
-                            <b-td>{{(pg.gameId === 'koz' && pg[1] > 0 ? '+' : '') + pg[1] * gamesObj[pg.gameId].damage}}</b-td>
-                            <b-td>{{(pg.gameId === 'koz' && pg[2] > 0 ? '+' : '') + pg[2] * gamesObj[pg.gameId].damage}}</b-td>
-                            <b-td>{{(pg.gameId === 'koz' && pg[3] > 0 ? '+' : '') + pg[3] * gamesObj[pg.gameId].damage}}</b-td>
+                            <b-td v-for="idx in [0, 1, 2, 3]">
+                              {{(pg.gameId === 'koz' && pg[idx] > 0 ? '+' : '') + pg[idx] * gamesObj[pg.gameId].damage}}
+                            </b-td>
                             <b-td>
                                 <b-button-group size="sm">
                                     <b-button :id="'edt'+i" variant="warning" @click="showEditGameModal(i)" :disabled="isOver"><i class="fas fa-pencil-alt"></i></b-button>
@@ -184,7 +191,7 @@
 
                 <div class="nameHolder">
                     <p v-for="i in [0,1,2,3]">
-                        <span>{{players[i].name.length < 14 ? players[i].name : `${players[i].name.substr(0, 11) + ".."}`}}: </span>
+                        <span>{{shorten(players[i].name, 14)}}: </span>
                         <b-button-group>
                           <b-button @click="togglePoints(i, -1)">-</b-button>
                           <b-button disabled>{{newGame[i]}}</b-button>
@@ -240,10 +247,10 @@
                 gamesObj: {},
                 playedGames: [],
                 remainingGames: [],
-                player0: {id: 0, name:'Oyuncu 1', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
-                player1: {id: 1, name:'Oyuncu 2', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
-                player2: {id: 2, name:'Oyuncu 3', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
-                player3: {id: 3, name:'Oyuncu 4', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
+                player0: {id: 0, name:'Oyuncu1', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
+                player1: {id: 1, name:'Oyuncu2', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
+                player2: {id: 2, name:'Oyuncu3', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
+                player3: {id: 3, name:'Oyuncu4', remainingPunishGames: 3, remainingTrumpGames: 2, points: 0},
                 elAlmaz: {id: 'elAlmaz', name: 'El Almaz', turnCount: 13, damage: -50, remainingCount: 2},
                 kupaAlmaz: {id: 'kupaAlmaz', name: 'Kupa Almaz', turnCount: 13, damage: -30, remainingCount: 2},
                 erkekAlmaz: {id: 'erkekAlmaz', name: 'Erkek Almaz', turnCount: 8, damage: -60, remainingCount: 2},
