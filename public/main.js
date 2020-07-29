@@ -316,7 +316,7 @@ var app = new Vue({
       }
     },
     shorten(name, maxLength) {
-      return name.length < maxLength ? name : `${name.substr(0, maxLength - 3)}..`
+      return name.length <= maxLength ? name : `${name.substr(0, maxLength - 3)}..`
     },
     isActive(active) {
       return active ?

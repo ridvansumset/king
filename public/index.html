@@ -133,17 +133,16 @@
             <b-table-simple bordered striped small hover responsive>
               <b-thead head-variant="dark">
                 <b-tr>
-                  <b-th>Sıra</b-th>
                   <b-th>Oyun</b-th>
                   <b-th v-for="p in players">
-                    {{shorten(p.name, 14)}}
+                    {{shorten(p.name, 6)}}
                   </b-th>
                   <b-th>Eylemler</b-th>
+                  <b-th>Sıra</b-th>
                 </b-tr>
               </b-thead>
               <b-tbody>
                 <b-tr v-for="(pg, i) in playedGames">
-                  <b-th>{{i+1}}</b-th>
                   <b-th>{{gamesObj[pg.gameId].name}}</b-th>
                   <b-td v-for="idx in [0, 1, 2, 3]">
                     {{pg[idx] * gamesObj[pg.gameId].damage}}
@@ -160,6 +159,7 @@
                       <b-tooltip target="del" triggers="hover" placement="right">Sil</b-tooltip>
                     </b-button-group>
                   </b-td>
+                  <b-th>{{i+1}}</b-th>
                 </b-tr>
               </b-tbody>
             </b-table-simple>
@@ -209,11 +209,11 @@
 
     <b-modal id="editGame" ref="editGame" title="Oyunu Düzenle" @ok="handleEditGame">
       <form ref="editGameForm">
-        <p style="text-align: center;border: solid 1px #777;">{{editGame.gameName}}</p>
+        <p style="text-align: center; text-decoration: underline;">{{editGame.gameName}}</p>
 
-        <div v-for="i in [0,1,2,3]" style="margin-top: 1em;">
-          <p style="text-align: center;">
-            <span>{{players[i].name}}: </span>
+        <div class="nameHolder">
+          <p v-for="i in [0,1,2,3]">
+            <span>{{shorten(players[i].name, 14)}}: </span>
             <b-button-group>
               <b-button @click="togglePoints(i, -1, true)">-</b-button>
               <b-button disabled>{{editGame[i]}}</b-button>
