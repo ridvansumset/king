@@ -4,11 +4,11 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
-    <link type="text/css" rel="stylesheet" href="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css"/>
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap/dist/css/bootstrap.min.css" />
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.css" />
 
     <title>Play King</title>
-    <link rel="shortcut icon" href="/king-card.png" type="image/png">
+    <link rel="shortcut icon" href="./king-card.png" type="image/png">
 
     <style type="text/css">
       .winner {
@@ -43,10 +43,9 @@
       }
     </style>
 
-    <script src="https://kit.fontawesome.com/2cc46be90a.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-    <script src="https://unpkg.com/babel-polyfill@latest/dist/polyfill.min.js"></script>
-    <script src="https://unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.js"></script>
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.min.js"></script>
+    <script src="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue-icons.min.js"></script>
 
     <!-- 🔥🔥🔥 -->
     <!-- update the version number as needed -->
@@ -56,65 +55,23 @@
     <script defer src="/__/firebase/7.17.1/firebase-database.js"></script>
     <script defer src="/__/firebase/7.17.1/firebase-messaging.js"></script>
     <script defer src="/__/firebase/7.17.1/firebase-storage.js"></script>
-<!--    <script defer  src="/__/firebase/7.17.1/firebase-firestore.js"></script>-->
+
+    <!-- TODO   <script defer  src="/__/firebase/7.17.1/firebase-firestore.js"></script> -->
+    <!--  <script src="/__/firebase/7.17.1/firebase-analytics.js"></script>-->
+
     <!-- initialize the SDK after all desired features are loaded -->
     <script defer src="/__/firebase/init.js"></script>
-
-<!--    <style media="screen">-->
-<!--      body { background: #ECEFF1; color: rgba(0,0,0,0.87); font-family: Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 0; }-->
-<!--      #message { background: white; max-width: 360px; margin: 100px auto 16px; padding: 32px 24px; border-radius: 3px; }-->
-<!--      #message h2 { color: #ffa100; font-weight: bold; font-size: 16px; margin: 0 0 8px; }-->
-<!--      #message h1 { font-size: 22px; font-weight: 300; color: rgba(0,0,0,0.6); margin: 0 0 16px;}-->
-<!--      #message p { line-height: 140%; margin: 16px 0 24px; font-size: 14px; }-->
-<!--      #message a { display: block; text-align: center; background: #039be5; text-transform: uppercase; text-decoration: none; color: white; padding: 16px; border-radius: 4px; }-->
-<!--      #message, #message a { box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24); }-->
-<!--      #load { color: rgba(0,0,0,0.4); text-align: center; font-size: 13px; }-->
-<!--      @media (max-width: 600px) {-->
-<!--        body, #message { margin-top: 0; background: white; box-shadow: none; }-->
-<!--        body { border-top: 16px solid #ffa100; }-->
-<!--      }-->
-<!--    </style>-->
     <!-- 🔥🔥🔥 -->
   </head>
   <body>
-  <!-- The core Firebase JS SDK is always required and must be listed first -->
-<!--  <script src="/__/firebase/7.17.1/firebase-app.js"></script>-->
-
-  <!-- TODO: Add SDKs for Firebase products that you want to use
-       https://firebase.google.com/docs/web/setup#available-libraries -->
-<!--  <script src="/__/firebase/7.17.1/firebase-analytics.js"></script>-->
-
-  <!-- Initialize Firebase -->
-<!--  <script src="/__/firebase/init.js"></script>-->
   <div id="app">
     <b-button id="yb" variant="primary" @click="$bvModal.show('newStartWarning')" style="margin: 1em 0 1em 1em;">
-      <i class="fas fa-redo-alt" ></i>
-      Yeniden Basla
+      Yeniden Başla
     </b-button>
-
-
-    <div style="display: grid; justify-content: center;" class="mb-3">
-      <b-button v-b-toggle.collapse-1 variant="light" style="width: 150px;">
-        Kalan Oyunlar
-      </b-button>
-      <b-collapse id="collapse-1" class="mt-2">
-        <div style="width: 150px;">
-          <div v-for="(g, i) in games">
-            <div
-              v-if="g.remainingCount > 0"
-              class="mb-1"
-              :style="{display: 'flex', justifyContent: 'space-between', borderBottom: i < games.length - 1 ? 'solid 1px #ddd' : null}"
-            >
-              <span>{{g.name}}</span> <span>{{g.remainingCount}}</span>
-            </div>
-          </div>
-        </div>
-      </b-collapse>
-    </div>
 
     <b-container>
       <b-row>
-        <b-col lg="6" offset-sm="3">
+        <b-col xs="10" sm="8" md="6" offset-xs="1" offset-sm="2" offset-md="3">
           <div>
             <b-table-simple bordered hover small responsive>
               <b-thead head-variant="dark">
@@ -133,12 +90,12 @@
                   </b-td>
                   <b-td>
                     <span v-for="i in p.remainingPunishGames" class="mr-1">
-                      <i class="fa fa-square" aria-hidden="true" style="font-size: 11px; color: lightcoral;"></i>
+                      <b-icon icon="square-fill" style="width: 11px; color: lightcoral;"></b-icon>
                     </span>
                   </b-td>
                   <b-td>
                     <span v-for="i in p.remainingTrumpGames" class="mr-1">
-                      <i class="fa fa-square" aria-hidden="true" style="font-size: 11px; color: lightgreen;"></i>
+                      <b-icon icon="square-fill" style="width: 11px; color: lightgreen;"></b-icon>
                     </span>
                   </b-td>
                   <b-td style="font-weight: bold;">{{p.points}}</b-td>
@@ -156,15 +113,22 @@
         </b-col>
       </b-row>
 
-      <div style="display: flex; justify-content: center;" class="mt-4 mb-3">
+      <div style="max-width: 600px; margin: 10px auto 0;">
+        <b-row>
+          <b-col v-for="(g, i) in games" cols="4" :offset="i === games.length - 1 ? 4 : 0" style="text-align: center;">
+            <p :style="{textDecoration: g.remainingCount === 0 ? 'line-through' : ''}">{{g.name}}</p>
+          </b-col>
+        </b-row>
+      </div>
+
+      <div style="display: flex; justify-content: center;" class="mt-3 mb-5">
         <b-button id="add" variant="success" @click="showNewGameModal" :disabled="isOver">
-          <i class="fas fa-plus"></i>
           Oyun Ekle
         </b-button>
       </div>
 
       <b-row v-if="playedGames.length">
-        <b-col lg="8" offset-sm="2">
+        <b-col xs="10" sm="8" md="6" offset-xs="1" offset-sm="2" offset-md="3">
           <div>
             <b-table-simple bordered striped small hover responsive>
               <b-thead head-variant="dark">
@@ -182,13 +146,17 @@
                   <b-th>{{i+1}}</b-th>
                   <b-th>{{gamesObj[pg.gameId].name}}</b-th>
                   <b-td v-for="idx in [0, 1, 2, 3]">
-                    {{(pg.gameId === 'koz' && pg[idx] > 0 ? '+' : '') + pg[idx] * gamesObj[pg.gameId].damage}}
+                    {{pg[idx] * gamesObj[pg.gameId].damage}}
                   </b-td>
                   <b-td>
                     <b-button-group size="sm">
-                      <b-button :id="'edt'+i" variant="warning" @click="showEditGameModal(i)" :disabled="isOver"><i class="fas fa-pencil-alt"></i></b-button>
+                      <b-button :id="'edt'+i" variant="warning" @click="showEditGameModal(i)" :disabled="isOver">
+                        <b-icon icon="pencil"></b-icon>
+                      </b-button>
                       <b-tooltip :target="'edt'+i" triggers="hover" placement="left">Düzenle</b-tooltip>
-                      <b-button id="del" v-if="i === playedGames.length - 1" variant="danger" @click="$bvModal.show('deleteGameWarning')"><i class="fas fa-trash-alt"></i></b-button>
+                      <b-button id="del" v-if="i === playedGames.length - 1" variant="danger" @click="$bvModal.show('deleteGameWarning')">
+                        <b-icon icon="trash-fill" variant="light"></b-icon>
+                      </b-button>
                       <b-tooltip target="del" triggers="hover" placement="right">Sil</b-tooltip>
                     </b-button-group>
                   </b-td>
@@ -272,43 +240,29 @@
     </b-modal>
   </div>
 
-  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
-  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   <script src="./main.js"></script>
+  <script>
+    // document.addEventListener('DOMContentLoaded', function() {
+      // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
+      // // The Firebase SDK is initialized and available here!
+      //
+      // firebase.auth().onAuthStateChanged(user => { });
+      // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
+      // firebase.messaging().requestPermission().then(() => { });
+      // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
+      //
+      // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
 
-  <!-- 🔥🔥🔥 -->
-<!--    <div id="message">-->
-<!--      <h2>Welcome</h2>-->
-<!--      <h1>Firebase Hosting Setup Complete</h1>-->
-<!--      <p>You're seeing this because you've successfully setup Firebase Hosting. Now it's time to go build something extraordinary!</p>-->
-<!--      <a target="_blank" href="https://firebase.google.com/docs/hosting/">Open Hosting Documentation</a>-->
-<!--    </div>-->
-<!--    <p id="load">Firebase SDK Loading&hellip;</p>-->
-
-    <script>
-      // document.addEventListener('DOMContentLoaded', function() {
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-        // // The Firebase SDK is initialized and available here!
-        //
-        // firebase.auth().onAuthStateChanged(user => { });
-        // firebase.database().ref('/path/to/ref').on('value', snapshot => { });
-        // firebase.messaging().requestPermission().then(() => { });
-        // firebase.storage().ref('/path/to/ref').getDownloadURL().then(() => { });
-        //
-        // // 🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥🔥
-
-        // try {
-        //   let app = firebase.app();
-        //   console.log(app);
-          // let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
-          // document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
-        // } catch (e) {
-        //   console.error(e);
-          // document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
-        // }
-      // });
-    </script>
-  <!-- 🔥🔥🔥 -->
+      // try {
+      //   let app = firebase.app();
+      //   console.log(app);
+        // let features = ['auth', 'database', 'messaging', 'storage'].filter(feature => typeof app[feature] === 'function');
+        // document.getElementById('load').innerHTML = `Firebase SDK loaded with ${features.join(', ')}`;
+      // } catch (e) {
+      //   console.error(e);
+        // document.getElementById('load').innerHTML = 'Error loading the Firebase SDK, check the console.';
+      // }
+    // });
+  </script>
   </body>
 </html>

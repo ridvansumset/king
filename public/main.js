@@ -320,8 +320,8 @@ var app = new Vue({
     },
     isActive(active) {
       return active ?
-        '<i class="fa fa-circle" aria-hidden="true" style="color: limegreen;"></i>' :
-        '<i class="fa fa-circle" aria-hidden="true" style="color: white;"></i>';
+        '<div style="display: inline-block; width: 11px; height: 11px; border-radius: 10px; background-color: limegreen;"></div>' :
+        '<div style="display: inline-block; width: 11px; height: 11px; border-radius: 10px; background-color: white;"></div>';
     },
   },
   beforeMount() {
