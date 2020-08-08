@@ -1,7 +1,9 @@
 # King
-An SPA to keep score records for the card game "King". It's available [here](http://play-king.herokuapp.com/).
+An SPA to keep score records for the card game "King". It's available [here](https://play-king.web.app/).
 
 ## TODOs
-- Add unit tests.
-- Use firebase to save game data instead of local storage.
-- Make shareable URLs, so that other players can see the score in their devices, as well.
+- Use bootstrap-vue icons instead of font-awesome,
+- Use firebase instead of local storage,
+- Make shareable URLs, so that other players can see the score in their devices, as well,
+- Add unit tests,
+- SEO
