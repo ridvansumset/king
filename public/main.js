@@ -34,7 +34,7 @@ var app = new Vue({
     koz: {id: 'koz', name: 'Koz', turnCount: 13, damage: 50, remainingCount: 8},
     isOver: false,
     selectedGame: null,
-    // onlyWinner: {wins: false, name: ''},
+    // onlyWinner: {wins: false, name: ''}
     maxPointsAvailable: 13,
     remainingGameCount: 20,
     newGame: {0: 0, 1: 0, 2: 0, 3: 0},
